@@ -36,11 +36,6 @@ class AdminPanel {
 			// Hide image selection button (keeps preview visible)
 			const imgUpload = document.getElementById('imageUpload');
 			if (imgUpload) imgUpload.style.display = 'none';
-			// Add read-only mode banner at top-right
-			const note = document.createElement('div');
-			note.className = 'readonly-note';
-			note.textContent = 'Read-only mode: admin features disabled.';
-			document.body.appendChild(note);
 		}
 	}
 	

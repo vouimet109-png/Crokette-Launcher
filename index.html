@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>Game Admin Panel</title>
+	<title>Crokette Launcher</title>
 	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self';" />
 	<style>
 		* { margin: 0; padding: 0; box-sizing: border-box; }
@@ -18,6 +18,8 @@
 		.header { text-align: center; margin-bottom: 30px; }
 		.header h1 { font-size: 28px; margin-bottom: 5px; }
 		.header p { opacity: 0.7; }
+		.header .btn { margin-top: 15px; display: inline-block; width: auto; padding: 12px 24px; text-decoration: none; color: #001a33; font-size: 16px; }
+		.header .btn:hover { opacity: 0.85; transform: translateY(-2px); }
 		
 		.panel { display: flex; gap: 20px; }
 		.panel-left { flex: 1; max-width: 400px; }
@@ -225,113 +227,23 @@
 <body>
 	<div class="container">
 		<div class="header">
-			<h1>🎮 Game Admin Panel</h1>
-			<p>Manage your game store - Add, Edit, Delete games</p>
-		</div>
-		
-		<div class="stats">
-			<div class="stat-box">
-				<div class="stat-number" id="statTotal">0</div>
-				<div class="stat-label">Total Games</div>
-			</div>
-			<div class="stat-box">
-				<div class="stat-number" id="statActive">0</div>
-				<div class="stat-label">Active</div>
-			</div>
-			<div class="stat-box">
-				<div class="stat-number" id="statComingSoon">0</div>
-				<div class="stat-label">Coming Soon</div>
-			</div>
+			<h1>🚀 Crokette Launcher</h1>
+			<p>Your personal application launcher</p>
+			<a href="https://github.com" target="_blank" class="btn btn-primary" style="display: inline-block; width: auto; padding: 12px 24px; margin-top: 15px; text-decoration: none; color: #001a33;">📥 Download on GitHub</a>
 		</div>
 		
 		<div id="alertContainer"></div>
 		
 		<div class="panel">
-			<!-- Left: Form -->
-			<div class="panel-left">
-				<div class="form-section">
-					<h2>📝 Game Details</h2>
-					
-					<input type="hidden" id="gameId" value="">
-					
-					<div class="form-group">
-						<label>Game Name *</label>
-						<input type="text" id="gameName" placeholder="e.g., Pixel Adventure">
-					</div>
-					
-					<div class="form-group">
-						<label>Description *</label>
-						<textarea id="gameDesc" placeholder="Short description..."></textarea>
-					</div>
-					
-					<div class="form-group">
-						<label>Download URL *</label>
-						<input type="text" id="gameUrl" placeholder="https://...">
-					</div>
-					
-					<div class="form-group">
-						<label>Size</label>
-						<input type="text" id="gameSize" placeholder="e.g., 50 MB">
-					</div>
-					
-					<div class="form-group">
-						<label>Version</label>
-						<input type="text" id="gameVersion" placeholder="e.g., 1.0.0" value="1.0.0">
-					</div>
-					
-					<div class="form-group">
-						<label>Game Image</label>
-						<div class="image-upload" id="imageUpload">
-							<div>📷 Click to upload image</div>
-							<input type="file" id="imageFile" accept="image/*" style="display:none;">
-						</div>
-						<img id="imagePreview" class="image-preview" style="display:none;">
-					</div>
-					
-					<div class="form-group checkbox-group">
-						<input type="checkbox" id="comingSoon">
-						<label for="comingSoon" style="margin: 0;">Coming Soon</label>
-					</div>
-					
-					<button class="btn btn-primary" id="saveBtn">Save Game</button>
-					<button class="btn btn-primary" id="resetBtn" style="background: rgba(100,100,100,0.5); margin-top: 10px;">Clear Form</button>
-			
-					<hr style="margin:14px 0; border: none; border-top: 1px solid rgba(0,212,255,0.06);">
-					<div style="font-size:13px; margin-bottom:8px; opacity:0.85;">Publish to GitHub (optional)</div>
-					<div class="form-group">
-						<label>Repo Owner</label>
-						<input type="text" id="ghOwner" placeholder="your-username or org">
-					</div>
-					<div class="form-group">
-						<label>Repo Name</label>
-						<input type="text" id="ghRepo" placeholder="your-repo-name">
-					</div>
-					<div class="form-group">
-						<label>File Path (in repo)</label>
-						<input type="text" id="ghPath" placeholder="data/games.json" value="data/games.json">
-					</div>
-					<div class="form-group">
-						<label>Personal Access Token</label>
-						<input type="password" id="ghToken" placeholder="ghp_... (kept locally)" autocomplete="new-password">
-					</div>
-					<div class="form-group">
-						<label>Commit Message</label>
-						<input type="text" id="ghMessage" placeholder="Update games.json from admin" value="Update games.json via admin panel">
-					</div>
-					<button class="btn btn-primary" id="publishBtn" style="margin-top:6px;">Publish to GitHub</button>
-				</div>
-			</div>
-			
-			<!-- Right: Games List -->
-			<div class="panel-right">
-				<div class="form-section">
-					<h2>🎯 Games Library</h2>
-					<div class="games-grid" id="gamesList"></div>
-				</div>
+			<!-- Games List -->
+			<div class="form-section" style="width: 100%;">
+				<h2>🎯 Games Library</h2>
+				<div class="games-grid" id="gamesList"></div>
 			</div>
 		</div>
 	</div>
 	
 	<script src="code.js"></script>
+	<script src="gamecode.js"></script>
 </body>
 </html>
