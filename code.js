@@ -24,37 +24,113 @@ class AdminPanel {
  			document.getElementById('imageFile').addEventListener('change', (e) => this.handleImageSelect(e));
  			const pubBtn = document.getElementById('publishBtn');
  			if (pubBtn) pubBtn.addEventListener('click', () => this.publishToGitHub());
- 		} else {
- 			// Disable/hide mutation controls in public (non-Electron) mode
- 			const controls = ['saveBtn','resetBtn','imageUpload','imageFile','ghOwner','ghRepo','ghPath','ghToken','ghMessage','publishBtn'];
- 			controls.forEach(id => {
- 				const el = document.getElementById(id);
- 				if (!el) return;
- 				el.disabled = true;
- 				if (el.tagName === 'INPUT' || el.tagName === 'BUTTON') el.style.opacity = '0.6';
- 			});
- 			// Hide image selection button (keeps preview visible)
- 			const imgUpload = document.getElementById('imageUpload');
- 			if (imgUpload) imgUpload.style.display = 'none';
- 			// Optionally annotate the UI to indicate read-only mode
- 			const note = document.createElement('div');
- 			note.className = 'readonly-note';
- 			note.textContent = 'Read-only mode: admin features disabled in this public site.';
- 			const header = document.getElementById('adminHeader') || document.body;
- 			header.insertBefore(note, header.firstChild);
- 		}
+		} else {
+			// Disable/hide mutation controls in public (non-Electron) mode
+			const controls = ['saveBtn','resetBtn','imageUpload','imageFile','ghOwner','ghRepo','ghPath','ghToken','ghMessage','publishBtn'];
+			controls.forEach(id => {
+				const el = document.getElementById(id);
+				if (!el) return;
+				el.disabled = true;
+				if (el.tagName === 'INPUT' || el.tagName === 'BUTTON') el.style.opacity = '0.6';
+			});
+			// Hide image selection button (keeps preview visible)
+			const imgUpload = document.getElementById('imageUpload');
+			if (imgUpload) imgUpload.style.display = 'none';
+			// Add read-only mode banner at top-right
+			const note = document.createElement('div');
+			note.className = 'readonly-note';
+			note.textContent = 'Read-only mode: admin features disabled.';
+			document.body.appendChild(note);
+		}
 	}
 	
 	async loadGames() {
 		try {
-			const response = await fetch('data/games.json');
-			const data = await response.json();
-			this.games = data.games || [];
+			// Try to load from game/ folder first (auto-detect)
+			const folderGames = await this.scanGameFolder();
+			if (folderGames && folderGames.length > 0) {
+				this.games = folderGames;
+			} else {
+				// Fallback to data/games.json if no games found in folder
+				const response = await fetch('data/games.json');
+				const data = await response.json();
+				this.games = data.games || [];
+			}
 			this.renderGames();
 			this.updateStats();
 		} catch (e) {
 			console.error('Failed to load games', e);
 			this.showAlert('Failed to load games', 'error');
+		}
+	}
+	
+	async scanGameFolder() {
+		try {
+			// Fetch list of game folders from game/ directory
+			const response = await fetch('game/');
+			const html = await response.text();
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(html, 'text/html');
+			const links = doc.querySelectorAll('a');
+			const games = [];
+			
+			for (const link of links) {
+				const href = link.getAttribute('href');
+				if (href && !href.includes('.') && href !== '/' && href !== '../') {
+					const gameFolder = href.replace(/\/$/, '');
+					try {
+						const game = await this.loadGameFromFolder(gameFolder);
+						if (game) games.push(game);
+					} catch (err) {
+						console.warn(`Failed to load game from ${gameFolder}:`, err);
+					}
+				}
+			}
+			return games.length > 0 ? games : null;
+		} catch (e) {
+			console.log('No game folder detection available (expected in static hosting):', e);
+			return null;
+		}
+	}
+	
+	async loadGameFromFolder(folderName) {
+		try {
+			// Load package.json from game folder
+			const pkgResponse = await fetch(`game/${folderName}/package.json`);
+			if (!pkgResponse.ok) return null;
+			const pkg = await pkgResponse.json();
+			
+			// Load Cover.png as image
+			let image = null;
+			try {
+				const imgResponse = await fetch(`game/${folderName}/Cover.png`);
+				if (imgResponse.ok) {
+					const blob = await imgResponse.blob();
+					const reader = new FileReader();
+					image = await new Promise((resolve) => {
+						reader.onload = () => resolve(reader.result.split(',')[1]);
+						reader.readAsDataURL(blob);
+					});
+				}
+			} catch (imgErr) {
+				console.warn(`No Cover.png found for ${folderName}`);
+			}
+			
+			const game = {
+				id: pkg.gameId || folderName,
+				name: pkg.name || folderName,
+				desc: pkg.description || 'No description',
+				downloadUrl: pkg.downloadUrl || `game/${folderName}/`,
+				size: pkg.size || 'Unknown',
+				version: pkg.version || '1.0.0',
+				comingSoon: pkg.comingSoon || false,
+				image: image
+			};
+			
+			return game;
+		} catch (e) {
+			console.error(`Error loading game from folder ${folderName}:`, e);
+			return null;
 		}
 	}
 	
