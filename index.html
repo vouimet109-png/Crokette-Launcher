@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Crokette Launcher</title>
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self';" />
+	<style>
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		html, body {
+			width: 100%;
+			height: 100%;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			background: #001a33;
+			color: #eef6ff;
+		}
+		.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+		.header { text-align: center; margin-bottom: 30px; }
+		.header h1 { font-size: 28px; margin-bottom: 5px; }
+		.header p { opacity: 0.7; }
+		.header .btn { margin-top: 15px; display: inline-block; width: auto; padding: 12px 24px; text-decoration: none; color: #001a33; font-size: 16px; }
+		.header .btn:hover { opacity: 0.85; transform: translateY(-2px); }
+		
+		.panel { display: flex; gap: 20px; }
+		.panel-left { flex: 1; max-width: 400px; }
+		.panel-right { flex: 2; }
+		
+		.form-section {
+			background: rgba(14,38,54,0.6);
+			border: 1px solid rgba(0,212,255,0.2);
+			border-radius: 12px;
+			padding: 20px;
+			margin-bottom: 20px;
+		}
+		
+		.form-section h2 { font-size: 16px; margin-bottom: 15px; color: #00d4ff; }
+		
+		.form-group {
+			margin-bottom: 15px;
+		}
+		
+		.form-group label {
+			display: block;
+			margin-bottom: 5px;
+			font-size: 12px;
+			font-weight: 600;
+			opacity: 0.8;
+		}
+		
+		.form-group input,
+		.form-group textarea {
+			width: 100%;
+			padding: 10px;
+			border: 1px solid rgba(0,212,255,0.2);
+			border-radius: 6px;
+			background: rgba(0,10,20,0.5);
+			color: #eef6ff;
+			font-family: inherit;
+		}
+		
+		.form-group textarea { resize: vertical; min-height: 80px; }
+		
+		.form-group input:focus,
+		.form-group textarea:focus {
+			outline: none;
+			border-color: #00d4ff;
+			background: rgba(0,10,20,0.8);
+		}
+		
+		.image-upload {
+			border: 2px dashed rgba(0,212,255,0.3);
+			border-radius: 8px;
+			padding: 15px;
+			text-align: center;
+			cursor: pointer;
+			transition: all 0.3s;
+		}
+		
+		.image-upload:hover {
+			border-color: #00d4ff;
+			background: rgba(0,212,255,0.05);
+		}
+		
+		.image-preview {
+			width: 100%;
+			max-height: 150px;
+			border-radius: 8px;
+			margin-top: 10px;
+			object-fit: cover;
+		}
+		
+		.btn {
+			padding: 10px 16px;
+			border-radius: 8px;
+			border: none;
+			cursor: pointer;
+			font-weight: 600;
+			transition: all 0.3s;
+		}
+		
+		.btn-primary {
+			background: linear-gradient(135deg, #00d4ff, #00a0cc);
+			color: #001a33;
+			width: 100%;
+		}
+		
+		.btn-primary:hover { opacity: 0.9; }
+		.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+		
+		.btn-danger {
+			background: #ff4444;
+			color: white;
+			padding: 6px 12px;
+			font-size: 12px;
+		}
+		
+		.btn-danger:hover { opacity: 0.9; }
+		
+		.games-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+			gap: 15px;
+		}
+		
+		.game-card {
+			background: rgba(14,38,54,0.6);
+			border: 1px solid rgba(0,212,255,0.2);
+			border-radius: 12px;
+			padding: 15px;
+			cursor: pointer;
+			transition: all 0.3s;
+		}
+		
+		.game-card:hover {
+			border-color: #00d4ff;
+			background: rgba(14,38,54,0.9);
+		}
+		
+		.game-card.selected {
+			border-color: #00d4ff;
+			background: rgba(0,212,255,0.1);
+		}
+		
+		.game-card-image {
+			width: 100%;
+			height: 120px;
+			background: rgba(0,0,0,0.3);
+			border-radius: 8px;
+			object-fit: cover;
+			margin-bottom: 10px;
+		}
+		
+		.game-card-title { font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+		.game-card-desc { font-size: 11px; opacity: 0.7; margin-bottom: 10px; }
+		
+		.game-card-actions { display: flex; gap: 5px; }
+		.game-card-actions button { flex: 1; padding: 5px; font-size: 11px; }
+		
+		.checkbox-group {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+		
+		.checkbox-group input[type="checkbox"] {
+			width: auto;
+			border: none;
+			cursor: pointer;
+		}
+		
+		.alert {
+			padding: 12px;
+			border-radius: 8px;
+			margin-bottom: 15px;
+			font-size: 13px;
+		}
+		
+		.alert-success {
+			background: rgba(76, 175, 80, 0.2);
+			border: 1px solid #4CAF50;
+			color: #90EE90;
+		}
+		
+		.alert-error {
+			background: rgba(255, 68, 68, 0.2);
+			border: 1px solid #ff4444;
+			color: #ff8888;
+		}
+		
+		.stats {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 10px;
+			margin-bottom: 20px;
+		}
+		
+		.stat-box {
+			background: rgba(0,212,255,0.1);
+			border: 1px solid rgba(0,212,255,0.2);
+			border-radius: 8px;
+			padding: 15px;
+			text-align: center;
+		}
+		
+		.stat-number { font-size: 24px; font-weight: 700; color: #00d4ff; }
+		.stat-label { font-size: 11px; opacity: 0.7; margin-top: 5px; }
+		
+		input[type="hidden"] { display: none; }
+		
+		.readonly-note {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			background: rgba(255, 68, 68, 0.15);
+			border: 1px solid rgba(255, 100, 100, 0.4);
+			border-radius: 8px;
+			padding: 12px 16px;
+			font-size: 12px;
+			color: #ff8888;
+			z-index: 1000;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+			max-width: 250px;
+			text-align: right;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<h1>🚀 Crokette Launcher</h1>
+			<p>Your personal application launcher</p>
+			<a href="https://github.com" target="_blank" class="btn btn-primary" style="display: inline-block; width: auto; padding: 12px 24px; margin-top: 15px; text-decoration: none; color: #001a33;">📥 Download on GitHub</a>
+		</div>
+		
+		<div id="alertContainer"></div>
+		
+		<div class="panel">
+			<!-- Games List -->
+			<div class="form-section" style="width: 100%;">
+				<h2>🎯 Games Library</h2>
+				<div class="games-grid" id="gamesList"></div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="code.js"></script>
+	<script src="gamecode.js"></script>
+</body>
+</html>
